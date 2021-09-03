@@ -43,32 +43,49 @@ class Torus:
 		return (x_avg, y_avg, z_avg)
 
 
+class Plane:
+	def __init__(self, top_left, top_right, bottom_left, bottom_right):
+		self.top_left = top_left
+		self.top_right = top_right
+		self.bottom_left = bottom_left
+		self.bottom_right = bottom_right
+
 class Scene:
 	def __init__(self, obj, light_source, observer):
-		self.object = obj
+		self.obj = obj
 		self.light_source = light_source
 		self.observer = observer
+		self.plane = self.__compute_plane()
+
+	def __compute_plane(self):
+		obj_center = self.obj.center_of_gravity()
+		x_position = np.average([obj_center[0] + self.observer[0]])
+		obj_border = self.obj.get_border_cube()
+		y_min = obj_border[0][1]
+		y_max = obj_border[1][1]
+		z_min = obj_border[0][2]
+		z_max = obj_border[1][2]
+		MARGIN_FACTOR = 1.1
+		top_left = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_min, z_max]))
+		top_right = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_max, z_max]))
+		bottom_left = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_min, z_min]))
+		bottom_right = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_max, z_min]))
+		return Plane(top_left, top_right, bottom_left, bottom_right)
+
 
 if __name__ == "__main__":
-	print("hello")
-
 	R = 1
 	r = 0.2
-
-	torus = Torus(R, r)
-
-	points = torus.points
-	print(len(points))
-
-	print(torus.get_border_cube())
-	print(torus.center_of_gravity())
-
-
-
-
-
-
-
-
-
 	
+	torus = Torus(R, r)
+	light_source = (2 * R, 2 * R, 2 * R)
+	observer = (3 * R, 0, 0)
+	scene = Scene(torus, light_source, observer)
+
+
+
+
+
+
+
+
