@@ -8,9 +8,9 @@ class Torus:
 		self.r = r
 		self.thetas = np.arange(0, 2 * math.pi, 2 * math.pi / 100)
 		self.phis = np.arange(0, 2 * math.pi, 2 * math.pi / 100)
-		self.__update_points()
+		self.update()
 
-	def __update_points(self):
+	def update(self):
 		new_points = []
 		for theta in self.thetas:
 			for phi in self.phis:
@@ -44,11 +44,11 @@ class Torus:
 
 
 class Plane:
-	def __init__(self, top_left, top_right, bottom_left, bottom_right):
-		self.top_left = top_left
-		self.top_right = top_right
-		self.bottom_left = bottom_left
-		self.bottom_right = bottom_right
+	def __init__(self, normal, p0):
+		self.normal = normal
+		self.p0 = p0
+		self.PIXEL_WIDTH = 80
+		self.PIXEL_HEIGHT = 30
 
 class Scene:
 	def __init__(self, obj, light_source, observer):
@@ -59,29 +59,27 @@ class Scene:
 
 	def __compute_plane(self):
 		obj_center = self.obj.center_of_gravity()
-		x_position = np.average([obj_center[0] + self.observer[0]])
-		obj_border = self.obj.get_border_cube()
-		y_min = obj_border[0][1]
-		y_max = obj_border[1][1]
-		z_min = obj_border[0][2]
-		z_max = obj_border[1][2]
-		MARGIN_FACTOR = 1.1
-		top_left = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_min, z_max]))
-		top_right = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_max, z_max]))
-		bottom_left = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_min, z_min]))
-		bottom_right = tuple(map(lambda elem: elem * MARGIN_FACTOR, [x_position, y_max, z_min]))
-		return Plane(top_left, top_right, bottom_left, bottom_right)
+		center_to_observer_vector = np.array(self.observer) - np.array(obj_center)
+		plane_normal = self.__normalize_vector(center_to_observer_vector)
+		p0 = np.average([obj_center[0] + self.observer[0]])
+		return Plane(plane_normal, p0)
 
+	def __normalize_vector(self, vector):
+		vector = np.array(vector)
+		norm = np.linalg.norm(vector)
+		if norm == 0:
+			return vector
+		else:
+			return vector / norm
 
 if __name__ == "__main__":
 	R = 1
 	r = 0.2
-	
+
 	torus = Torus(R, r)
 	light_source = (2 * R, 2 * R, 2 * R)
 	observer = (3 * R, 0, 0)
 	scene = Scene(torus, light_source, observer)
-
 
 
 
