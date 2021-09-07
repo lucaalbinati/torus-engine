@@ -12,6 +12,61 @@ def normalize_vector(vector):
 			return vector / norm
 
 
+class Line:
+	def __init__(self, distance_to_origin=5, step=0.01):
+		self.distance_to_origin = distance_to_origin
+		self.step = step
+		self.position_along_axis = [position for position in np.arange(-self.distance_to_origin, self.distance_to_origin, self.step)]
+		self.points = [self.point_equation(position) for position in self.position_along_axis]
+		self.normals = [self.normal_equation(position) for position in self.position_along_axis]
+
+	def point_equation(self, step):
+		return np.array([
+				0,
+				0,
+				step
+			])
+
+	def normal_equation(self, step):
+		return normalize_vector(np.array([
+				1,
+				0,
+				0
+			]))
+
+	def contains_point(self, point):
+		return False
+
+
+class Sphere:
+	def __init__(self, R, theta_step=200, phi_step=200):
+		self.R = R
+		self.r = r
+		self.theta_step = theta_step
+		self.phi_step = phi_step
+		self.thetas = np.arange(0, 2 * math.pi, 2 * math.pi / self.theta_step)
+		self.phis = np.arange(0, math.pi, math.pi / self.phi_step)
+		self.points = [self.point_equation(theta, phi) for theta in self.thetas for phi in self.phis]
+		self.normals = [self.normal_equation(theta, phi) for theta in self.thetas for phi in self.phis]
+
+	def point_equation(self, theta, phi):
+		return np.array([
+				self.R * math.cos(theta) * math.sin(phi),
+				self.R * math.sin(theta) * math.sin(phi),
+				self.R * math.cos(phi)
+			])
+
+	def normal_equation(self, theta, phi):
+		return normalize_vector(np.array([
+				math.cos(theta) * math.sin(phi),
+				math.sin(theta) * math.sin(phi),
+				math.cos(phi)
+			]))
+
+	def contains_point(self, point):
+		x, y, z = point[0], point[1], point[2]
+		return (x**2 + y**2 + z**2) <= self.R
+
 class Torus:
 	def __init__(self, R, r, theta_step=100, phi_step=100):
 		self.R = R
@@ -25,17 +80,17 @@ class Torus:
 		
 	def point_equation(self, theta, phi):
 		return np.array([
-			self.R * math.cos(theta) + r * math.cos(phi),
-			self.R * math.sin(theta) + r * math.cos(phi),
-			self.r * math.sin(phi)
+				self.R * math.cos(theta) + r * math.cos(phi),
+				self.R * math.sin(theta) + r * math.cos(phi),
+				self.r * math.sin(phi)
 			])
 
 	def normal_equation(self, theta, phi):
-		return np.array([
-			self.r * math.cos(phi),
-			self.r * math.cos(phi),
-			self.r * math.sin(phi)
-			])
+		return normalize_vector(np.array([
+				math.cos(phi),
+				math.cos(phi),
+				math.sin(phi)
+			]))
 
 	def contains_point(self, point):
 		x, y, z = point[0], point[1], point[2]
@@ -49,7 +104,7 @@ class Torus:
 class Plane:
 	# FIXME and maybe change how init works by not giving a "up" vector, but instead a degree of rotation, [0-360]
 
-	def __init__(self, normal, up, p0, aspect_ratio=32/9, height=0.5, nb_pixel_height=27):
+	def __init__(self, normal, up, p0, aspect_ratio=32/9, height=0.5, nb_pixel_height=64):
 		self.normal = normalize_vector(normal)
 		self.up = normalize_vector(up)
 		self.horizontal = np.cross(self.normal, self.up)
@@ -182,9 +237,9 @@ if __name__ == "__main__":
 	R = 1
 	r = 0.2
 
-	torus = Torus(R, r)
-
-	#torus = Object([[0, 0, 0], [0, 0.5, 0.5]], [[1, 0, 0], [1, 0, 0]])
+	#obj = Torus(R, r)
+	obj = Sphere(R)
+	obj = Line()
 
 	observer = np.array([2 * R, 0, 0])
 	light_source = observer
@@ -192,12 +247,11 @@ if __name__ == "__main__":
 	# observer = np.array([0, 0, 6 * R])
 	# light_source = observer
 	
-	#camera_plane = Plane.compute_plane(observer, torus, up=np.array([0, 0, 1]))
 	normal = np.array([-1, 0, 0])
 	up = np.array([0, 0, 1])
 	p0 = Plane.compute_p0(observer, normal)
 	camera_plane = Plane(normal, up, p0)
-	scene = Scene(torus, light_source, observer, camera_plane)
+	scene = Scene(obj, light_source, observer, camera_plane)
 
 	scene.show()
 
