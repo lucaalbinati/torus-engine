@@ -1,3 +1,4 @@
+import sys
 import math
 import numpy as np
 
@@ -10,8 +11,37 @@ def normalize_vector(vector):
 		else:
 			return vector / norm
 
+# class Object:
+# 	def __init__(self, points, normals):
+# 		self.points = points
+# 		self.normals = normals
+
+# 	def update(self):
+# 		return None
+
+# 	def get_border_cube(self):
+# 		x_values = list(map(lambda p: p[0], self.points))
+# 		y_values = list(map(lambda p: p[1], self.points))
+# 		z_values = list(map(lambda p: p[2], self.points))
+
+# 		x_min = min(x_values)
+# 		x_max = max(x_values)
+# 		y_min = min(y_values)
+# 		y_max = max(y_values)
+# 		z_min = min(z_values)
+# 		z_max = max(z_values)
+
+# 		return [(x_min, y_min, z_min), (x_max, y_max, z_max)]
+
+# 	def center_of_gravity(self):
+# 		border_cube = self.get_border_cube()
+# 		x_avg = np.average([border_cube[0][0], border_cube[1][0]])
+# 		y_avg = np.average([border_cube[0][1], border_cube[1][1]])
+# 		z_avg = np.average([border_cube[0][2], border_cube[1][2]])
+# 		return (x_avg, y_avg, z_avg)
+
 class Torus:
-	def __init__(self, R, r, theta_step=10, phi_step=10):
+	def __init__(self, R, r, theta_step=100, phi_step=100):
 		self.R = R
 		self.r = r
 		self.theta_step = theta_step
@@ -28,9 +58,9 @@ class Torus:
 				new_point_x = self.R * math.cos(theta) + r * math.cos(phi)
 				new_point_y = self.R * math.sin(theta) + r * math.cos(phi)
 				new_point_z = self.r * math.sin(phi)
-				new_point = (new_point_x, new_point_y, new_point_z)
+				new_point = np.array([new_point_x, new_point_y, new_point_z])
 				new_points.append(new_point)
-				new_normal = (r * math.cos(phi), r * math.cos(phi), new_point_z)
+				new_normal = np.array([r * math.cos(phi), r * math.cos(phi), new_point_z])
 				new_normals.append(new_normal)
 		self.points = new_points
 		self.normals = new_normals
@@ -56,9 +86,19 @@ class Torus:
 		z_avg = np.average([border_cube[0][2], border_cube[1][2]])
 		return (x_avg, y_avg, z_avg)
 
+	def contains_point(self, point):
+		x, y, z = point[0], point[1], point[2]
+		contains = True
+		contains = contains and (self.R - self.r <= abs(x) <= self.R + self.r)
+		contains = contains and (self.R - self.r <= abs(y) <= self.R + self.r)
+		contains = contains and (0 <= abs(z) <= self.r)
+		return contains
+
 
 class Plane:
-	def __init__(self, normal, up, p0, aspect_ratio=16/9, height=0.5, nb_pixel_height=45):
+	# FIXME and maybe change how init works by not giving a "up" vector, but instead a degree of rotation, [0-360]
+
+	def __init__(self, normal, up, p0, aspect_ratio=32/9, height=0.5, nb_pixel_height=27):
 		self.normal = normalize_vector(normal)
 		self.up = normalize_vector(up)
 		self.horizontal = np.cross(self.normal, self.up)
@@ -71,13 +111,18 @@ class Plane:
 		self.pixel_incr = self.width / self.nb_pixel_width
 
 	@staticmethod
-	def compute_plane(observer, obj, up, camera_observer_distance=1):
-		obj_center = obj.center_of_gravity()
-		observer_to_center_vector = np.array(obj_center) - np.array(observer)
-		normal = normalize_vector(observer_to_center_vector)
-		p0 = observer + camera_observer_distance * normal
-		up = normalize_vector(up)
-		return Plane(normal, up, p0)
+	def compute_p0(observer, normal, camera_observer_distance=1):
+		return observer + camera_observer_distance * normal
+
+	# FIXME false -> have to ensure that normal dot up = 0
+	# @staticmethod
+	# def compute_plane(observer, obj, up, camera_observer_distance=1):
+	# 	obj_center = obj.center_of_gravity()
+	# 	observer_to_center_vector = np.array(obj_center) - np.array(observer)
+	# 	normal = normalize_vector(observer_to_center_vector)
+	# 	p0 = observer + camera_observer_distance * normal
+	# 	up = normalize_vector(up)
+	# 	return Plane(normal, up, p0)
 
 	def find_intersection(self, vector_start, vector):
 		l0 = vector_start
@@ -106,27 +151,31 @@ class Plane:
 				point = top_left_corner + w_incr * self.horizontal + h_incr * self.up
 
 				i = h * self.nb_pixel_width + w
-				grid_points[i] = (point, 0, 0)
-
-		#for i, (point, _, _) in grid_points.items():
-		#	print("{}: {}".format(i, point))
+				grid_points[i] = (point, sys.maxsize, 0)
 
 		# find a way to clip each intersection point to the grid (ideally without having to compute [#grid_points * #intersection_points] distances)
 		for (intersection_point, depth, brightness) in intersections_on_plane:
-			grid_position_x = int((intersection_point[0] - top_left_corner[0]) / self.nb_pixel_width)
-			grid_position_y = int((intersection_point[1] - top_left_corner[1]) / self.nb_pixel_height)
-			grid_position = grid_position_y * self.nb_pixel_width + grid_position_x
+			tlc_to_intersection_point = intersection_point - top_left_corner
+			horizontal_shift = np.dot(self.horizontal, tlc_to_intersection_point)
+			vertical_shift = np.dot(self.up, tlc_to_intersection_point)
+			grid_position_w = int(horizontal_shift / self.pixel_incr)
+			grid_position_h = int(- vertical_shift / self.pixel_incr)
+			grid_position = grid_position_h * self.nb_pixel_width + grid_position_w
 			if grid_position in grid_points:
-				grid_points[grid_position] = (intersection_point, depth, brightness)
+				# replace the point if it is closer to the observer
+				if depth < grid_points[grid_position][1]:
+					grid_points[grid_position] = (intersection_point, depth, brightness)
 
 		return grid_points
 
 class Scene:
-	def __init__(self, obj, light_source, observer, camera_plane):
+	def __init__(self, obj, light_source, observer, camera_plane, brightness_chars=" :?X#M&%@$"):
+		# TODO add possiblity for multiple objects
 		self.obj = obj
 		self.light_source = light_source
 		self.observer = observer
 		self.camera_plane = camera_plane
+		self.brightness_chars = brightness_chars
 
 	def __compute_illumination(self):
 		self.brightnesses = []
@@ -134,7 +183,7 @@ class Scene:
 			observer_to_point_vector = np.array(point) - np.array(self.observer)
 			point_to_light_vector = np.array(point) - np.array(self.light_source)
 			brightness = np.dot(observer_to_point_vector, point_to_light_vector)
-			direction = np.dot(normal, observer_to_point_vector)
+			direction = np.dot(normal, - observer_to_point_vector)
 			if direction <= 0:
 				brightness = 0
 			self.brightnesses.append(brightness)
@@ -144,25 +193,39 @@ class Scene:
 		for point, brightness in zip(self.obj.points, self.brightnesses):
 			observer_to_point_vector = np.array(point) - np.array(self.observer)
 			distance_to_point = np.linalg.norm(observer_to_point_vector)
-			intersection_on_plane = self.camera_plane.find_intersection(self.observer, observer_to_point_vector)
-			intersections_on_plane.append((intersection_on_plane, distance_to_point, brightness))
+
+			# verify that the point is in the line of sight of the observer
+			is_visible_to_observer = True
+			step = 0.1
+			for m in np.arange(step, distance_to_point - step, step):
+				point_m = self.observer + m * observer_to_point_vector
+				if self.obj.contains_point(point_m):
+					is_visible_to_observer = False
+
+			# only project the points on the camera plane that are visible to the observer
+			if is_visible_to_observer:
+				intersection_on_plane = self.camera_plane.find_intersection(self.observer, observer_to_point_vector)
+				intersections_on_plane.append((intersection_on_plane, distance_to_point, brightness))
+		
 		return intersections_on_plane
 
 	def show(self):
 		self.obj.update()
 		self.__compute_illumination()
 		intersections_on_plane = self.__compute_intersections_on_plane()
-		
-		#for point, distance_to_point, brightness in intersections_on_plane:
-		#	print("{}: {}, {}".format(point, distance_to_point, brightness))
 
-		intersections_on_plane = self.camera_plane.clip_points_to_pixels(intersections_on_plane)
-		# sort first by i (see #Plane::clip_points_to_pixels) and then by depth (in case there are several intersection points at the same i)
-		#intersections_on_plane = sorted(intersections_on_plane, key=lambda elem: (elem[0], elem[1]))
+		pixels_on_plane = self.camera_plane.clip_points_to_pixels(intersections_on_plane)
 
-		#for i, (intersection_point, depth, brightness) in intersections_on_plane.items():
-		#	print("{}: {}, {}, {}".format(i, intersection_point, depth, brightness))
-		
+		brightnesses = np.array([[i, brightness] for i, (_, _, brightness) in pixels_on_plane.items()])
+		max_brightness = max(brightnesses[:, 1])
+		brightnesses = list(map(lambda b: [b[0], b[1] / max_brightness], brightnesses))
+		brightnesses = [[i, int(10 * np.around(brightness, decimals=1))] for i, brightness in brightnesses]
+
+		for i, brightness in brightnesses:
+			if i % self.camera_plane.nb_pixel_width == 0 and i > 0:
+				print("-")
+			print(self.brightness_chars[min(brightness, 9)], end='')
+		print()
 
 
 if __name__ == "__main__":
@@ -170,9 +233,20 @@ if __name__ == "__main__":
 	r = 0.2
 
 	torus = Torus(R, r)
-	light_source = np.array([3 * R, 0, 0])
-	observer = np.array([3 * R, 1, 0])
-	camera_plane = Plane.compute_plane(observer, torus, up=np.array([0, 0, 1]))
+
+	#torus = Object([[0, 0, 0], [0, 0.5, 0.5]], [[1, 0, 0], [1, 0, 0]])
+
+	observer = np.array([2 * R, 0, 0])
+	light_source = observer
+	
+	# observer = np.array([0, 0, 6 * R])
+	# light_source = observer
+	
+	#camera_plane = Plane.compute_plane(observer, torus, up=np.array([0, 0, 1]))
+	normal = np.array([-1, 0, 0])
+	up = np.array([0, 0, 1])
+	p0 = Plane.compute_p0(observer, normal)
+	camera_plane = Plane(normal, up, p0)
 	scene = Scene(torus, light_source, observer, camera_plane)
 
 	scene.show()
