@@ -11,34 +11,6 @@ def normalize_vector(vector):
 		else:
 			return vector / norm
 
-# class Object:
-# 	def __init__(self, points, normals):
-# 		self.points = points
-# 		self.normals = normals
-
-# 	def update(self):
-# 		return None
-
-# 	def get_border_cube(self):
-# 		x_values = list(map(lambda p: p[0], self.points))
-# 		y_values = list(map(lambda p: p[1], self.points))
-# 		z_values = list(map(lambda p: p[2], self.points))
-
-# 		x_min = min(x_values)
-# 		x_max = max(x_values)
-# 		y_min = min(y_values)
-# 		y_max = max(y_values)
-# 		z_min = min(z_values)
-# 		z_max = max(z_values)
-
-# 		return [(x_min, y_min, z_min), (x_max, y_max, z_max)]
-
-# 	def center_of_gravity(self):
-# 		border_cube = self.get_border_cube()
-# 		x_avg = np.average([border_cube[0][0], border_cube[1][0]])
-# 		y_avg = np.average([border_cube[0][1], border_cube[1][1]])
-# 		z_avg = np.average([border_cube[0][2], border_cube[1][2]])
-# 		return (x_avg, y_avg, z_avg)
 
 class Torus:
 	def __init__(self, R, r, theta_step=100, phi_step=100):
@@ -48,43 +20,22 @@ class Torus:
 		self.phi_step = phi_step
 		self.thetas = np.arange(0, 2 * math.pi, 2 * math.pi / self.theta_step)
 		self.phis = np.arange(0, 2 * math.pi, 2 * math.pi / self.phi_step)
-		self.update()
+		self.points = [self.point_equation(theta, phi) for theta in self.thetas for phi in self.phis]
+		self.normals = [self.normal_equation(theta, phi) for theta in self.thetas for phi in self.phis]
+		
+	def point_equation(self, theta, phi):
+		return np.array([
+			self.R * math.cos(theta) + r * math.cos(phi),
+			self.R * math.sin(theta) + r * math.cos(phi),
+			self.r * math.sin(phi)
+			])
 
-	def update(self):
-		new_points = []
-		new_normals = []
-		for theta in self.thetas:
-			for phi in self.phis:
-				new_point_x = self.R * math.cos(theta) + r * math.cos(phi)
-				new_point_y = self.R * math.sin(theta) + r * math.cos(phi)
-				new_point_z = self.r * math.sin(phi)
-				new_point = np.array([new_point_x, new_point_y, new_point_z])
-				new_points.append(new_point)
-				new_normal = np.array([r * math.cos(phi), r * math.cos(phi), new_point_z])
-				new_normals.append(new_normal)
-		self.points = new_points
-		self.normals = new_normals
-
-	def get_border_cube(self):
-		x_values = list(map(lambda p: p[0], self.points))
-		y_values = list(map(lambda p: p[1], self.points))
-		z_values = list(map(lambda p: p[2], self.points))
-
-		x_min = min(x_values)
-		x_max = max(x_values)
-		y_min = min(y_values)
-		y_max = max(y_values)
-		z_min = min(z_values)
-		z_max = max(z_values)
-
-		return [(x_min, y_min, z_min), (x_max, y_max, z_max)]
-
-	def center_of_gravity(self):
-		border_cube = self.get_border_cube()
-		x_avg = np.average([border_cube[0][0], border_cube[1][0]])
-		y_avg = np.average([border_cube[0][1], border_cube[1][1]])
-		z_avg = np.average([border_cube[0][2], border_cube[1][2]])
-		return (x_avg, y_avg, z_avg)
+	def normal_equation(self, theta, phi):
+		return np.array([
+			self.r * math.cos(phi),
+			self.r * math.cos(phi),
+			self.r * math.sin(phi)
+			])
 
 	def contains_point(self, point):
 		x, y, z = point[0], point[1], point[2]
@@ -210,7 +161,6 @@ class Scene:
 		return intersections_on_plane
 
 	def show(self):
-		self.obj.update()
 		self.__compute_illumination()
 		intersections_on_plane = self.__compute_intersections_on_plane()
 
