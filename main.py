@@ -104,32 +104,16 @@ class Torus:
 class Plane:
 	# FIXME and maybe change how init works by not giving a "up" vector, but instead a degree of rotation, [0-360]
 
-	def __init__(self, normal, up, p0, aspect_ratio=32/9, height=0.5, nb_pixel_height=64):
-		self.normal = normalize_vector(normal)
-		self.up = normalize_vector(up)
-		self.horizontal = np.cross(self.normal, self.up)
+	def __init__(self, p0, normal, up, horizontal, height, width, nb_pixel_height, nb_pixel_width, pixel_incr):
 		self.p0 = p0
-		self.aspect_ratio = aspect_ratio
+		self.normal = normal
+		self.up = up
+		self.horizontal = horizontal
 		self.height = height
-		self.width = self.height * self.aspect_ratio
+		self.width = width
 		self.nb_pixel_height = nb_pixel_height
-		self.nb_pixel_width = math.ceil(self.nb_pixel_height * self.aspect_ratio)
-		# TODO split into height_incr and width_incr, because characters displayed on terminal aren't squares, which means a circle isn't round unless we take into account the height/width ratio of a character bounding box
-		self.pixel_incr = self.width / self.nb_pixel_width
-
-	@staticmethod
-	def compute_p0(observer, normal, camera_observer_distance=1):
-		return observer + camera_observer_distance * normal
-
-	# FIXME false -> have to ensure that normal dot up = 0
-	# @staticmethod
-	# def compute_plane(observer, obj, up, camera_observer_distance=1):
-	# 	obj_center = obj.center_of_gravity()
-	# 	observer_to_center_vector = np.array(obj_center) - np.array(observer)
-	# 	normal = normalize_vector(observer_to_center_vector)
-	# 	p0 = observer + camera_observer_distance * normal
-	# 	up = normalize_vector(up)
-	# 	return Plane(normal, up, p0)
+		self.nb_pixel_width = nb_pixel_width
+		self.pixel_incr = pixel_incr
 
 	def find_intersection(self, vector_start, vector):
 		l0 = vector_start
@@ -176,27 +160,36 @@ class Plane:
 		return grid_points
 
 class Camera:
-	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1):
+	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, aspect_ratio=32/9, height=0.5, nb_pixel_height=64):
 		self.camera_point = observer
-		self.normal = normalize_vector(point_to_fix - self.camera_point)
-		self.p0 = self.camera_point + camera_to_plane_distance * self.normal
-		self.up, self.horizontal = self.__compute_camera_plane(point_to_fix, horizontal_rotation)
+		self.height = height
+		self.width = self.height * aspect_ratio
+		self.nb_pixel_height = nb_pixel_height
+		self.nb_pixel_width = math.ceil(self.nb_pixel_height * aspect_ratio)
+		# TODO split into height_incr and width_incr, because characters displayed on terminal aren't squares, which means a circle isn't round unless we take into account the height/width ratio of a character bounding box
+		self.pixel_incr = self.width / self.nb_pixel_width
+		
+		# compute plane
+		normal = normalize_vector(point_to_fix - self.camera_point)
+		p0 = self.camera_point + camera_to_plane_distance * normal
+		up, horizontal = self.__compute_camera_plane(normal, horizontal_rotation)
+		self.plane = Plane(p0, normal, up, horizontal, self.height, self.width, self.nb_pixel_height, self.nb_pixel_width, self.pixel_incr)
 
-	def __compute_camera_plane(self, point_to_fix, horizontal_rotation):
+	def __compute_camera_plane(self, normal, horizontal_rotation):
 		'''
 			Compute the 'up' and 'horizontal' vectors.
 			When positioned at the camera point and looking towards the point to fix, the 'up' vector is up and the 'horizontal' vector is horizontally to the right.
 		'''
 
 		# compute 'up' and 'horizontal' vectors assuming no rotation
-		if self.normal[1] == 0:
-			normal_xy_sign = np.sign(self.normal[0])
+		if normal[1] == 0:
+			normal_xy_sign = np.sign(normal[0])
 			horizontal_vector = normalize_vector(np.array([0, - normal_xy_sign, 0]))
 		else:
-			frac = - self.normal[0] / self.normal[1]
-			normal_xy_sign = - np.sign(self.normal[0]) * np.sign(self.normal[1])
+			frac = - normal[0] / normal[1]
+			normal_xy_sign = - np.sign(normal[0]) * np.sign(normal[1])
 			horizontal_vector = normal_xy_sign * normalize_vector(np.array([1, frac, 0]))			
-		up_vector = normalize_vector(np.cross(horizontal_vector, self.normal))
+		up_vector = normalize_vector(np.cross(horizontal_vector, normal))
 
 		# rotate both 'up' and 'horizontal' vectors
 		up_vector_factor = math.cos(horizontal_rotation)
@@ -205,17 +198,17 @@ class Camera:
 		horizontal_vector_factor = math.sin(horizontal_rotation) * (up_vector_norm / horizontal_vector_norm)
 
 		rotated_up_vector = up_vector_factor * up_vector + horizontal_vector_factor * horizontal_vector
-		rotated_horizontal_vector = np.cross(self.normal, rotated_up_vector)
+		rotated_horizontal_vector = np.cross(normal, rotated_up_vector)
 
 		return normalize_vector(rotated_up_vector), normalize_vector(rotated_horizontal_vector)
 
 class Scene:
-	def __init__(self, obj, light_source, observer, camera_plane, brightness_chars=" :?X#M&%@$"):
+	def __init__(self, obj, light_source, observer, camera, brightness_chars=" :?X#M&%@$"):
 		# TODO add possiblity for multiple objects
 		self.obj = obj
 		self.light_source = light_source
 		self.observer = observer
-		self.camera_plane = camera_plane
+		self.camera = camera
 		self.brightness_chars = brightness_chars
 
 	def __compute_illumination(self):
@@ -245,7 +238,7 @@ class Scene:
 
 			# only project the points on the camera plane that are visible to the observer
 			if is_visible_to_observer:
-				intersection_on_plane = self.camera_plane.find_intersection(self.observer, observer_to_point_vector)
+				intersection_on_plane = self.camera.plane.find_intersection(self.observer, observer_to_point_vector)
 				intersections_on_plane.append((intersection_on_plane, distance_to_point, brightness))
 		
 		return intersections_on_plane
@@ -254,7 +247,7 @@ class Scene:
 		self.__compute_illumination()
 		intersections_on_plane = self.__compute_intersections_on_plane()
 
-		pixels_on_plane = self.camera_plane.clip_points_to_pixels(intersections_on_plane)
+		pixels_on_plane = self.camera.plane.clip_points_to_pixels(intersections_on_plane)
 
 		brightnesses = np.array([[i, brightness] for i, (_, _, brightness) in pixels_on_plane.items()])
 		max_brightness = max(brightnesses[:, 1])
@@ -262,7 +255,7 @@ class Scene:
 		brightnesses = [[i, int(10 * np.around(brightness, decimals=1))] for i, brightness in brightnesses]
 
 		for i, brightness in brightnesses:
-			if i % self.camera_plane.nb_pixel_width == 0 and i > 0:
+			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
 				print("-")
 			print(self.brightness_chars[min(brightness, 9)], end='')
 		print()
@@ -274,21 +267,12 @@ if __name__ == "__main__":
 
 	#obj = Torus(R, r)
 	obj = Sphere(R)
-	obj = Line()
+	#obj = Line()
 
 	observer = np.array([2 * R, 0, 0])
 	light_source = observer
-	
-	# observer = np.array([0, 0, 6 * R])
-	# light_source = observer
-
 	camera = Camera(observer)
-	
-	normal = np.array([-1, 0, 0])
-	up = np.array([0, 0, 1])
-	p0 = Plane.compute_p0(observer, normal)
-	camera_plane = Plane(normal, up, p0)
-	scene = Scene(obj, light_source, observer, camera_plane)
+	scene = Scene(obj, light_source, observer, camera)
 
 	scene.show()
 
