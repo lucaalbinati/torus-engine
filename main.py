@@ -114,6 +114,7 @@ class Plane:
 		self.width = self.height * self.aspect_ratio
 		self.nb_pixel_height = nb_pixel_height
 		self.nb_pixel_width = math.ceil(self.nb_pixel_height * self.aspect_ratio)
+		# TODO split into height_incr and width_incr, because characters displayed on terminal aren't squares, which means a circle isn't round unless we take into account the height/width ratio of a character bounding box
 		self.pixel_incr = self.width / self.nb_pixel_width
 
 	@staticmethod
@@ -173,6 +174,40 @@ class Plane:
 					grid_points[grid_position] = (intersection_point, depth, brightness)
 
 		return grid_points
+
+class Camera:
+	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1):
+		self.camera_point = observer
+		self.normal = normalize_vector(point_to_fix - self.camera_point)
+		self.p0 = self.camera_point + camera_to_plane_distance * self.normal
+		self.up, self.horizontal = self.__compute_camera_plane(point_to_fix, horizontal_rotation)
+
+	def __compute_camera_plane(self, point_to_fix, horizontal_rotation):
+		'''
+			Compute the 'up' and 'horizontal' vectors.
+			When positioned at the camera point and looking towards the point to fix, the 'up' vector is up and the 'horizontal' vector is horizontally to the right.
+		'''
+
+		# compute 'up' and 'horizontal' vectors assuming no rotation
+		if self.normal[1] == 0:
+			normal_xy_sign = np.sign(self.normal[0])
+			horizontal_vector = normalize_vector(np.array([0, - normal_xy_sign, 0]))
+		else:
+			frac = - self.normal[0] / self.normal[1]
+			normal_xy_sign = - np.sign(self.normal[0]) * np.sign(self.normal[1])
+			horizontal_vector = normal_xy_sign * normalize_vector(np.array([1, frac, 0]))			
+		up_vector = normalize_vector(np.cross(horizontal_vector, self.normal))
+
+		# rotate both 'up' and 'horizontal' vectors
+		up_vector_factor = math.cos(horizontal_rotation)
+		up_vector_norm = np.linalg.norm(up_vector)
+		horizontal_vector_norm = np.linalg.norm(horizontal_vector)
+		horizontal_vector_factor = math.sin(horizontal_rotation) * (up_vector_norm / horizontal_vector_norm)
+
+		rotated_up_vector = up_vector_factor * up_vector + horizontal_vector_factor * horizontal_vector
+		rotated_horizontal_vector = np.cross(self.normal, rotated_up_vector)
+
+		return normalize_vector(rotated_up_vector), normalize_vector(rotated_horizontal_vector)
 
 class Scene:
 	def __init__(self, obj, light_source, observer, camera_plane, brightness_chars=" :?X#M&%@$"):
@@ -246,6 +281,8 @@ if __name__ == "__main__":
 	
 	# observer = np.array([0, 0, 6 * R])
 	# light_source = observer
+
+	camera = Camera(observer)
 	
 	normal = np.array([-1, 0, 0])
 	up = np.array([0, 0, 1])
