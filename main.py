@@ -18,7 +18,7 @@ if __name__ == "__main__":
 	#obj = Line()
 
 	observer = np.array([7 * R, 0, 0])
-	light_source = observer
+	light_source = np.array([0, 3 * R, 0])
 	camera = Camera(observer)
 	scene = Scene(obj, light_source, observer, camera)
 

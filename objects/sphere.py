@@ -27,6 +27,5 @@ class Sphere:
 			]))
 
 	def contains_point(self, point):
-		# FIXME why isn't the front of the sphere showing?
 		x, y, z = point[0], point[1], point[2]
 		return (x**2 + y**2 + z**2) <= self.R
