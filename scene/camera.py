@@ -4,20 +4,20 @@ from utils import normalize_vector
 from .plane import Plane
 
 class Camera:
-	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, aspect_ratio=32/9, height=0.5, nb_pixel_height=64):
+	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, aspect_ratio=16/9, width=1, nb_pixel_width=230, character_aspect_ratio=1/2):
 		self.camera_point = observer
-		self.height = height
-		self.width = self.height * aspect_ratio
-		self.nb_pixel_height = nb_pixel_height
-		self.nb_pixel_width = math.ceil(self.nb_pixel_height * aspect_ratio)
-		# TODO split into height_incr and width_incr, because characters displayed on terminal aren't squares, which means a circle isn't round unless we take into account the height/width ratio of a character bounding box
-		self.pixel_incr = self.width / self.nb_pixel_width
 		
-		# compute plane
+		# compute plane vectors
 		normal = normalize_vector(point_to_fix - self.camera_point)
 		p0 = self.camera_point + camera_to_plane_distance * normal
 		up, horizontal = self.__compute_camera_plane(normal, horizontal_rotation)
-		self.plane = Plane(p0, normal, up, horizontal, self.height, self.width, self.nb_pixel_height, self.nb_pixel_width, self.pixel_incr)
+		
+		# init camera plane
+		height = width / aspect_ratio
+		nb_pixel_height = math.ceil(nb_pixel_width * character_aspect_ratio / aspect_ratio)
+		pixel_incr_height = height / nb_pixel_height
+		pixel_incr_width = width / nb_pixel_width
+		self.plane = Plane(p0, normal, up, horizontal, height, width, nb_pixel_height, nb_pixel_width, pixel_incr_height, pixel_incr_width)
 
 	def __compute_camera_plane(self, normal, horizontal_rotation):
 		'''

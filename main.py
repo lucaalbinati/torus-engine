@@ -17,13 +17,9 @@ if __name__ == "__main__":
 	obj = Sphere(R)
 	#obj = Line()
 
-	observer = np.array([2 * R, 0, 0])
+	observer = np.array([7 * R, 0, 0])
 	light_source = observer
 	camera = Camera(observer)
 	scene = Scene(obj, light_source, observer, camera)
 
 	scene.show()
-
-	
-
-

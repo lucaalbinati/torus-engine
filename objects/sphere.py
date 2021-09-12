@@ -3,7 +3,7 @@ import numpy as np
 from utils import normalize_vector
 
 class Sphere:
-	def __init__(self, R, theta_step=200, phi_step=200):
+	def __init__(self, R, theta_step=100, phi_step=100):
 		self.R = R
 		self.theta_step = theta_step
 		self.phi_step = phi_step
@@ -27,5 +27,6 @@ class Sphere:
 			]))
 
 	def contains_point(self, point):
+		# FIXME why isn't the front of the sphere showing?
 		x, y, z = point[0], point[1], point[2]
 		return (x**2 + y**2 + z**2) <= self.R
