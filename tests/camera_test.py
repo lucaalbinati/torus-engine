@@ -56,6 +56,22 @@ def camera_rotation_3_test():
 	assert(np.allclose(camera.plane.horizontal, normalize_vector(np.array([-1, 1, -math.sqrt(2)]))))
 	print("camera_rotation_3_test successful")
 
+def camera_top_test():
+	observer = np.array([0, 0, 1])
+	camera = Camera(observer)
+	assert(np.allclose(camera.plane.normal, normalize_vector(np.array([0, 0, -1]))))
+	assert(np.allclose(camera.plane.up, normalize_vector(np.array([-1, 0, 0]))))
+	assert(np.allclose(camera.plane.horizontal, normalize_vector(np.array([0, 1, 0]))))
+	print("camera_top_test successful")
+
+def camera_top_and_rotation_test():
+	observer = np.array([0, 0, 1])
+	camera = Camera(observer, horizontal_rotation=(math.pi))
+	assert(np.allclose(camera.plane.normal, normalize_vector(np.array([0, 0, -1]))))
+	assert(np.allclose(camera.plane.up, normalize_vector(np.array([1, 0, 0]))))
+	assert(np.allclose(camera.plane.horizontal, normalize_vector(np.array([0, -1, 0]))))
+	print("camera_top_and_rotation_test successful")
+
 def camera_complete_test():
 	observer = np.array([1, 1, 2])
 	point_to_fix = np.array([-0.5, 2, 0])
@@ -65,12 +81,14 @@ def camera_complete_test():
 	assert(np.allclose(camera.plane.horizontal, np.array([0.82924649, 0.29700559, -0.47343208])))
 	print("camera_rotation_3_test successful")
 
+
 camera_y_0_test()
 camera_y_not_0_test()
 camera_point_to_fix_test()
 camera_rotation_test()
 camera_rotation_2_test()
 camera_rotation_3_test()
+camera_top_test()
+camera_top_and_rotation_test()
 camera_complete_test()
-
 

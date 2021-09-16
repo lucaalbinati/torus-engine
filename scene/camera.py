@@ -26,7 +26,9 @@ class Camera:
 		'''
 
 		# compute 'up' and 'horizontal' vectors assuming no rotation
-		if normal[1] == 0:
+		if normal[0] == 0 and normal[1] == 0:
+			horizontal_vector = np.array([0, 1, 0])
+		elif normal[1] == 0:
 			normal_xy_sign = np.sign(normal[0])
 			horizontal_vector = normalize_vector(np.array([0, - normal_xy_sign, 0]))
 		else:
