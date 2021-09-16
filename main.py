@@ -8,17 +8,19 @@ from objects.torus import Torus
 from scene.scene import Scene
 from scene.camera import Camera
 from scene.plane import Plane
+from scene.light import Light
 
 if __name__ == "__main__":
 	R = 1
 	r = 0.2
 
-	#obj = Torus(R, r)
+	obj = Torus(R, r)
 	obj = Sphere(R)
 	#obj = Line()
 
 	observer = np.array([7 * R, 0, 0])
-	light_source = np.array([0, 3 * R, 0])
+	#light_source = Light(np.array([0, 10 * R, 0]))
+	light_source = Light(observer)
 	camera = Camera(observer)
 	scene = Scene(obj, light_source, observer, camera)
 
