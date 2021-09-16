@@ -50,7 +50,6 @@ class Scene:
 				intersection_on_plane = self.camera.plane.find_intersection(self.observer, point_to_observer_vector)
 				intersections_on_plane.append((intersection_on_plane, distance_to_point, brightness))
 		
-		print("nb intersection points on plane: {}".format(len(intersections_on_plane)))
 		return intersections_on_plane
 
 	def show(self):
