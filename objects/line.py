@@ -22,6 +22,3 @@ class Line:
 				0,
 				0
 			]))
-
-	def contains_point(self, point):
-		return False

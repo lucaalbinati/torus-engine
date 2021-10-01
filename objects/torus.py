@@ -26,11 +26,3 @@ class Torus:
 				math.cos(phi),
 				math.sin(phi)
 			]))
-
-	def contains_point(self, point):
-		x, y, z = point[0], point[1], point[2]
-		contains = True
-		contains = contains and (self.R - self.r <= abs(x) <= self.R + self.r)
-		contains = contains and (self.R - self.r <= abs(y) <= self.R + self.r)
-		contains = contains and (0 <= abs(z) <= self.r)
-		return contains

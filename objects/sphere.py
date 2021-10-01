@@ -25,6 +25,3 @@ class Sphere:
 				math.sin(theta) * math.sin(phi),
 				math.cos(phi)
 			]))
-
-	def contains_point(self, point):
-		return np.linalg.norm(point) <= self.R
