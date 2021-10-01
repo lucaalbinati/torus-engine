@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 
@@ -29,3 +30,6 @@ def normalize_vector(vector):
 			return vector
 		else:
 			return vector / norm
+
+
+clear_console = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')

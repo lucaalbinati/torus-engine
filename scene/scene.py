@@ -1,5 +1,5 @@
 import numpy as np
-from utils import normalize_vector, get_brightness_char
+from utils import normalize_vector, get_brightness_char, clear_console
 
 class Scene:
 	def __init__(self, obj, light_source, observer, camera):
@@ -44,6 +44,8 @@ class Scene:
 
 		pixels_on_plane = self.camera.plane.clip_points_to_pixels(intersections_on_plane)
 
+
+		clear_console()
 		for i, (_, _, brightness) in pixels_on_plane.items():
 			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
 				print("-")
