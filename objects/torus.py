@@ -15,8 +15,8 @@ class Torus:
 		
 	def point_equation(self, theta, phi):
 		return np.array([
-				self.R * math.cos(theta) + self.r * math.cos(phi),
-				self.R * math.sin(theta) + self.r * math.cos(phi),
+				(self.R + self.r * math.cos(phi)) * math.cos(theta),
+				(self.R + self.r * math.cos(phi)) * math.sin(theta),
 				self.r * math.sin(phi)
 			])
 
