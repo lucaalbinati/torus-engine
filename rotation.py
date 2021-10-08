@@ -51,9 +51,20 @@ class Rotation:
 	def full_around_y(scene):
 		def rotation_matrix_func(theta):
 			return np.array([
-					[math.cos(theta), 0, -math.sin(theta)],
+					[math.cos(theta), 0, math.sin(theta)],
 					[0, 1, 0],
-					[math.sin(theta), 0, math.cos(theta)]
+					[-math.sin(theta), 0, math.cos(theta)]
+				])
+
+		return Rotation(scene, rotation_matrix_func, start_theta=0, end_theta=math.pi)
+
+	@staticmethod
+	def full_around_z(scene):
+		def rotation_matrix_func(theta):
+			return np.array([
+					[math.cos(theta), -math.sin(theta), 0],
+					[math.sin(theta), math.cos(theta), 0],
+					[0, 0, 1]
 				])
 
 		return Rotation(scene, rotation_matrix_func, start_theta=0, end_theta=math.pi)
