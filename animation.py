@@ -65,6 +65,12 @@ class Animation:
 		return Animation(scene, start_point, end_point)
 
 	@staticmethod
+	def left_to_right_light_animation(scene):
+		start_point = np.array([2, -5, 0])
+		end_point = np.array([2, 5, 0])
+		return Animation(scene, start_point, end_point, animation_duration_in_sec=5)
+
+	@staticmethod
 	def down_to_up_light_animation(scene):
 		start_point = np.array([3, 0, - 2])
 		end_point = np.array([3, 0, 2])
