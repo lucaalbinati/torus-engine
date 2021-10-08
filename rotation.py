@@ -17,10 +17,11 @@ class Rotation:
 		excessive_computation_count = 0
 		excessive_computations = []
 
-		for i in range(0, self.nb_frames):
+		for i in range(0, self.nb_frames + 1):
 			before_comp_time = time.time()
 
-			self.scene.obj.rotate(self.rotation_matrix_func, self.theta_incr)
+			if i > 0:
+				self.scene.obj.rotate(self.rotation_matrix_func, self.theta_incr)
 			self.scene.show()
 
 			after_comp_time = time.time()
