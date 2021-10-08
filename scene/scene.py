@@ -2,29 +2,27 @@ import numpy as np
 from utils import normalize_vector, get_brightness_char, clear_console
 
 class Scene:
-	def __init__(self, obj, light_source, observer, camera):
+	def __init__(self, obj, light_source, camera):
 		# TODO add possiblity for multiple objects
 		self.obj = obj
 		self.light_source = light_source
-		self.observer = observer
 		self.camera = camera
 
 	def __compute_illumination(self):
 		self.brightnesses = []
 		for point, normal in zip(self.obj.points, self.obj.normals):
-			brightness = self.light_source.compute_brightness_on_point(self.observer, point, normal)
+			brightness = self.light_source.compute_brightness_on_point(self.camera.camera_point, point, normal)
 			self.brightnesses.append(brightness)
 
 	def __compute_pixels(self):
 		pixels = self.camera.plane.get_fresh_init_pixels()
-
 		for point, brightness in zip(self.obj.points, self.brightnesses):
-			point_to_observer_vector = np.array(self.observer) - np.array(point)
-			distance_to_point = np.linalg.norm(point_to_observer_vector)
+			point_to_camera_vector = np.array(self.camera.camera_point) - np.array(point)
+			distance_to_point = np.linalg.norm(point_to_camera_vector)
 
-			# only project the points on the camera plane that are visible to the observer
+			# only project the points on the camera plane that are visible to the camera
 			if brightness > 0:
-				intersection_on_plane = self.camera.plane.find_intersection(self.observer, point_to_observer_vector)
+				intersection_on_plane = self.camera.plane.find_intersection(self.camera.camera_point, point_to_camera_vector)
 				pixel = self.camera.plane.clip_point_to_pixel(intersection_on_plane)
 
 				if not pixel in pixels or distance_to_point < pixels[pixel][1]:
