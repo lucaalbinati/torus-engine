@@ -1,9 +1,9 @@
 import math
 import numpy as np
-from utils import normalize_vector
+from utils import normalize_vector, rotate
 
 class Torus:
-	def __init__(self, R, r, theta_step=100, phi_step=100):
+	def __init__(self, R=1.0, r=0.2, theta_step=100, phi_step=100):
 		self.R = R
 		self.r = r
 		self.theta_step = theta_step
@@ -26,3 +26,6 @@ class Torus:
 				math.cos(phi),
 				math.sin(phi)
 			]))
+
+	def rotate(self, rotation_matrix_func, theta):
+		self.points, self.normals = rotate(rotation_matrix_func, theta, self.points, self.normals)

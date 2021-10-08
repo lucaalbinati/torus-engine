@@ -32,6 +32,9 @@ class Scene:
 		
 		return pixels
 
+	def modify_camera(self, camera):
+		self.camera = camera
+
 	def modify_light_source(self, light_source):
 		self.light_source = light_source
 

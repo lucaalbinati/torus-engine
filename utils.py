@@ -33,3 +33,16 @@ def normalize_vector(vector):
 
 
 clear_console = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+
+def rotate(rotation_matrix_func, theta, points, normals):
+		points = np.transpose(points)
+		normals = np.transpose(normals)
+		rotation_matrix = rotation_matrix_func(theta)
+
+		if len(rotation_matrix.shape) != 2 or rotation_matrix.shape[1] != points.shape[0]:
+			raise Exception("Rotation matrix must have the same number of columns as the number of dimensions, instead got {} and {}".format(rotation_matrix.shape, self.points.shape))
+		
+		points = np.transpose(np.dot(rotation_matrix, points))
+		normals = np.transpose(np.dot(rotation_matrix, normals))
+
+		return points, normals

@@ -6,26 +6,19 @@ from scene.scene import Scene
 from scene.camera import Camera
 from scene.light import Light
 from animation import Animation
+from rotation import Rotation
 
 if __name__ == "__main__":
-	R = 1
-	r = 0.2
+	obj = Torus()
 
-	#obj = Torus(R, r)
-	obj = Sphere(R)
-	#obj = Line()
-
-	observer = np.array([7 * R, 0, 0])
-	light_source = Light(np.array([10 * R, 0, 0]))
+	observer = np.array([7, 0, 3])
+	light_source = Light(np.array([10, 0, 0]))
 	camera = Camera(observer)
 	scene = Scene(obj, light_source, observer, camera)
+	scene.show()
 
-	light_source_start_point = np.array([3 * R, 0, 0])
-	light_source_end_point = np.array([0, 3 * R, 4 * R])
-	light_animation = Animation(scene, light_source_start_point, light_source_end_point)
+	# light_animation = Animation.middle_to_up_camera_animation(scene)
+	# light_animation.animate_camera()
 
-	light_animation.animate()
-
-	#import cProfile
-	#cProfile.run('light_animation.animate()')
-	
+	rotation_animation = Rotation.full_around_y(scene)
+	rotation_animation.animate()
