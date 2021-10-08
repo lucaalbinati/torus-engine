@@ -14,11 +14,11 @@ if __name__ == "__main__":
 	observer = np.array([7, 0, 3])
 	light_source = Light(np.array([10, 0, 0]))
 	camera = Camera(observer)
-	scene = Scene(obj, light_source, observer, camera)
-	scene.show()
+	scene = Scene(obj, light_source, camera)
+	# scene.show()
 
-	# light_animation = Animation.middle_to_up_camera_animation(scene)
-	# light_animation.animate_camera()
+	# light_animation = Animation.middle_to_right_light_animation(scene)
+	# light_animation.animate_light()
 
 	rotation_animation = Rotation.full_around_y(scene)
 	rotation_animation.animate()

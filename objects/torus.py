@@ -22,8 +22,8 @@ class Torus:
 
 	def normal_equation(self, theta, phi):
 		return normalize_vector(np.array([
-				math.cos(phi),
-				math.cos(phi),
+				math.cos(theta) * math.cos(phi),
+				math.sin(theta) * math.cos(phi),
 				math.sin(phi)
 			]))
 
