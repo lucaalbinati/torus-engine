@@ -33,7 +33,7 @@ class Rotation:
 				excessive_computation_count += 1
 				excessive_computations.append(comp_time)
 				if excessive_computation_count >= 3:
-					print("WARNING: computation regularly takes more time than {} (1/FPS) (takes an average of {:.3f}s)".format(1 / self.FPS, np.mean(excessive_computations)))
+					print("WARNING: computation regularly takes more time than {}s (1/FPS) (takes an average of {:.3f}s)".format(1 / self.FPS, np.mean(excessive_computations)))
 
 			time.sleep(max(sleep_time, 0))
 
