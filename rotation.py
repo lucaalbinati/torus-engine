@@ -39,33 +39,46 @@ class Rotation:
 
 	@staticmethod
 	def full_around_x(scene):
-		def rotation_matrix_func(theta):
-			return np.array([
-					[1, 0, 0],
-					[0, math.cos(theta), -math.sin(theta)],
-					[0, math.sin(theta), math.cos(theta)]
-				])
-
-		return Rotation(scene, rotation_matrix_func, start_theta=0, end_theta=math.pi)
+		return Rotation(scene, Rotation.rotation_x_matrix, start_theta=0, end_theta=math.pi)
 
 	@staticmethod
 	def full_around_y(scene):
-		def rotation_matrix_func(theta):
-			return np.array([
-					[math.cos(theta), 0, math.sin(theta)],
-					[0, 1, 0],
-					[-math.sin(theta), 0, math.cos(theta)]
-				])
-
-		return Rotation(scene, rotation_matrix_func, start_theta=0, end_theta=math.pi)
+		return Rotation(scene, Rotation.rotation_y_matrix, start_theta=0, end_theta=math.pi)
 
 	@staticmethod
 	def full_around_z(scene):
-		def rotation_matrix_func(theta):
-			return np.array([
-					[math.cos(theta), -math.sin(theta), 0],
-					[math.sin(theta), math.cos(theta), 0],
-					[0, 0, 1]
-				])
+		return Rotation(scene, Rotation.rotation_z_matrix, start_theta=0, end_theta=math.pi)
 
-		return Rotation(scene, rotation_matrix_func, start_theta=0, end_theta=math.pi)
+	@staticmethod
+	def cool_around_yz(scene):
+		def rotation_func(theta):
+			rot_y = Rotation.rotation_y_matrix(theta)
+			rot_z = Rotation.rotation_z_matrix(theta*2/3)
+			return np.matmul(rot_y, rot_z)
+
+		return Rotation(scene, rotation_func, start_theta=0, end_theta=4*math.pi, animation_duration_in_sec=10)
+
+	@staticmethod
+	def rotation_x_matrix(theta):
+		return np.array([
+				[1, 0, 0],
+				[0, math.cos(theta), -math.sin(theta)],
+				[0, math.sin(theta), math.cos(theta)]
+			])
+
+	@staticmethod
+	def rotation_y_matrix(theta):
+		return np.array([
+				[math.cos(theta), 0, math.sin(theta)],
+				[0, 1, 0],
+				[-math.sin(theta), 0, math.cos(theta)]
+			])
+
+	@staticmethod
+	def rotation_z_matrix(theta):
+		return np.array([
+				[math.cos(theta), -math.sin(theta), 0],
+				[math.sin(theta), math.cos(theta), 0],
+				[0, 0, 1]
+			])
+
