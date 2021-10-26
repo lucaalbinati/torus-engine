@@ -9,10 +9,7 @@ class Scene:
 		self.camera = camera
 
 	def __compute_illumination(self):
-		self.brightnesses = []
-		for point, normal in zip(self.obj.points, self.obj.normals):
-			brightness = self.light_source.compute_brightness_on_point(self.camera.camera_point, point, normal)
-			self.brightnesses.append(brightness)
+		self.brightnesses = [self.light_source.compute_brightness_on_point(self.camera.camera_point, point, normal) for point, normal in zip(self.obj.points, self.obj.normals)]
 
 	def __compute_pixels(self):
 		pixels = self.camera.plane.get_fresh_init_pixels()
