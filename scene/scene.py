@@ -9,10 +9,25 @@ class Scene:
 		self.camera = camera
 
 	def __compute_illumination(self):
+		import time
+		begin = time.time()
 		self.brightnesses = []
 		for point, normal in zip(self.obj.points, self.obj.normals):
 			brightness = self.light_source.compute_brightness_on_point(self.camera.camera_point, point, normal)
 			self.brightnesses.append(brightness)
+		print("old: {}".format(time.time()-begin))
+		# self.brightnesses = np.array(list(zip(self.obj.points, self.obj.normals)))
+		# self.brightnesses = np.array([self.obj.points, self.obj.normals])
+		# np.vectorize(compute_brightness_on_point)(self.obj.points, self.obj.normals)
+
+		# print(self.brightnesses.shape)
+		begin = time.time()
+		brightnesses2 = self.light_source.compute_brightness_on_point2(self.camera.camera_point, self.obj.points, self.obj.normals)
+		print("new: {}".format(time.time()-begin))
+		print(self.brightnesses == brightnesses2)
+		# print(np.equal(self.brightnesses, brightnesses2).all())
+		print(self.brightnesses[4000:4010])
+		print(brightnesses2[4000:4010])
 
 	def __compute_pixels(self):
 		pixels = self.camera.plane.get_fresh_init_pixels()

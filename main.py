@@ -20,5 +20,8 @@ if __name__ == "__main__":
 	# light_animation = Animation.middle_to_right_light_animation(scene)
 	# light_animation.animate_light()
 
-	rotation_animation = Rotation.cool_around_yz(scene)
-	rotation_animation.animate()
+	# rotation_animation = Rotation.cool_around_yz(scene)
+	# rotation_animation.animate()
+
+	import cProfile
+	cProfile.run('scene.show()')
