@@ -1,5 +1,4 @@
 import numpy as np
-from utils import normalize_vector
 
 class Light:
 	def __init__(self, position, intensity=100, ambient_light=1):
@@ -8,8 +7,8 @@ class Light:
 		self.ambient_light = ambient_light
 
 	def compute_brightness_on_point(self, observer, point_position, point_normal):
-		point_to_observer_vector = normalize_vector(observer - point_position)
-		point_to_light_vector = normalize_vector(self.position - point_position)
+		point_to_observer_vector = observer - point_position
+		point_to_light_vector = self.position - point_position
 
 		point_to_observer_factor = np.dot(point_to_observer_vector, point_normal)
 		point_to_light_factor = np.dot(point_to_light_vector, point_normal)
