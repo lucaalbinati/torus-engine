@@ -30,6 +30,14 @@ class Scene:
 		
 		return pixels
 
+	def __print_pixels(self, pixels):
+		clear_console()
+		for i, (_, _, brightness) in pixels.items():
+			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
+				print("")
+			print(get_brightness_char(brightness), end='')
+		print()
+
 	def modify_camera(self, camera):
 		self.camera = camera
 
@@ -39,10 +47,4 @@ class Scene:
 	def show(self):
 		self.__compute_illumination()
 		pixels = self.__compute_pixels()
-
-		clear_console()
-		for i, (_, _, brightness) in pixels.items():
-			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
-				print("-")
-			print(get_brightness_char(brightness), end='')
-		print()
+		self.__print_pixels(pixels)
