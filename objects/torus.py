@@ -10,8 +10,8 @@ class Torus:
 		self.phi_step = phi_step
 		self.thetas = np.arange(0, 2 * math.pi, 2 * math.pi / self.theta_step)
 		self.phis = np.arange(0, 2 * math.pi, 2 * math.pi / self.phi_step)
-		self.points = [self.point_equation(theta, phi) for theta in self.thetas for phi in self.phis]
-		self.normals = [self.normal_equation(theta, phi) for theta in self.thetas for phi in self.phis]
+		self.points = np.array([self.point_equation(theta, phi) for theta in self.thetas for phi in self.phis])
+		self.normals = np.array([self.normal_equation(theta, phi) for theta in self.thetas for phi in self.phis])
 		
 	def point_equation(self, theta, phi):
 		return np.array([
