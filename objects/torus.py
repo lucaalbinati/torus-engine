@@ -3,7 +3,7 @@ import numpy as np
 from utils import normalize_vector, rotate
 
 class Torus:
-	def __init__(self, R=1.0, r=0.4, theta_step=100, phi_step=100):
+	def __init__(self, R=1.0, r=0.4, theta_step=75, phi_step=75):
 		self.R = R
 		self.r = r
 		self.theta_step = theta_step
