@@ -29,11 +29,12 @@ class Scene:
 
 	def __print_pixels(self, pixels):
 		clear_console()
+		text_to_print = ""
 		for i, (_, _, brightness) in pixels.items():
 			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
-				print("")
-			print(get_brightness_char(brightness), end='')
-		print()
+				text_to_print += "\n"
+			text_to_print += get_brightness_char(brightness)
+		print(text_to_print)
 
 	def modify_camera(self, camera):
 		self.camera = camera
