@@ -41,7 +41,7 @@ class Plane:
 		l = vector
 
 		# d = [(p0-l0) * n] / [n * l]
-		p0l0 = np.array(self.p0) - np.array(l0)
+		p0l0 = self.p0 - l0
 		top = np.dot(p0l0, self.normal)
 		bottom = np.dot(self.normal, l)
 		d = top / bottom

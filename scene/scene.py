@@ -14,11 +14,11 @@ class Scene:
 	def __compute_pixels(self):
 		pixels = self.camera.plane.get_fresh_init_pixels()
 		for point, brightness in zip(self.obj.points, self.brightnesses):
-			point_to_camera_vector = np.array(self.camera.camera_point) - np.array(point)
-			distance_to_point = np.linalg.norm(point_to_camera_vector)
-
 			# only project the points on the camera plane that are visible to the camera
 			if brightness > 0:
+				point_to_camera_vector = self.camera.camera_point - point
+				distance_to_point = np.linalg.norm(point_to_camera_vector)
+
 				intersection_on_plane = self.camera.plane.find_intersection(self.camera.camera_point, point_to_camera_vector)
 				pixel = self.camera.plane.clip_point_to_pixel(intersection_on_plane)
 
