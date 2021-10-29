@@ -1,10 +1,11 @@
+import os
 import math
 import numpy as np
 from utils import normalize_vector
 from .plane import Plane
 
 class Camera:
-	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, aspect_ratio=16/9, width=1, nb_pixel_width=230, character_aspect_ratio=1/2):
+	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=os.get_terminal_size(), character_aspect_ratio=1/2):
 		self.camera_point = observer
 		
 		# compute plane vectors
@@ -13,6 +14,9 @@ class Camera:
 		up, horizontal = self.__compute_camera_plane(normal, horizontal_rotation)
 		
 		# init camera plane
+		nb_pixel_width, nb_pixel_height = nb_pixels
+		aspect_ratio = nb_pixel_width / (nb_pixel_height / character_aspect_ratio)
+		width = 1
 		height = width / aspect_ratio
 		nb_pixel_height = math.ceil(nb_pixel_width * character_aspect_ratio / aspect_ratio)
 		pixel_incr_height = height / nb_pixel_height
