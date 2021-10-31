@@ -54,3 +54,16 @@ class Camera:
 		rotated_horizontal_vector = np.cross(normal, rotated_up_vector)
 
 		return normalize_vector(rotated_up_vector), normalize_vector(rotated_horizontal_vector)
+
+	# TODO move relative to observer-point_to_fix
+	def move_up(self):
+		self.__init__(self.camera_point + np.array([0, 0, 1]))
+
+	def move_down(self):
+		self.__init__(self.camera_point + np.array([0, 0, -1]))
+
+	def move_left(self):
+		self.__init__(self.camera_point + np.array([0, -1, 0]))
+
+	def move_right(self):
+		self.__init__(self.camera_point + np.array([0, 1, 0]))

@@ -1,12 +1,16 @@
+import time
 import numpy as np
 from utils import normalize_vector, get_brightness_char, clear_console
 
 class Scene:
-	def __init__(self, obj, light_source, camera):
+	def __init__(self, obj, light_source, camera, fps=5):
 		# TODO add possiblity for multiple objects
 		self.obj = obj
 		self.light_source = light_source
 		self.camera = camera
+		if not (type(fps) == int and fps >= 1):
+			raise Exception("FPS value must be an int greater or equal to 1, instead got '{}'".format(fps))
+		self.fps = fps
 
 	def __compute_illumination(self):
 		self.brightnesses = [self.light_source.compute_brightness_on_point(self.camera.camera_point, point, normal) for point, normal in zip(self.obj.points, self.obj.normals)]
@@ -38,13 +42,38 @@ class Scene:
 			text_to_print += get_brightness_char(brightness)
 		print(text_to_print)
 
+	def __update_scene(self):
+		self.__compute_illumination()
+		pixels = self.__compute_pixels()
+		self.__print_pixels(pixels)
+
 	def modify_camera(self, camera):
 		self.camera = camera
 
 	def modify_light_source(self, light_source):
 		self.light_source = light_source
 
-	def show(self):
-		self.__compute_illumination()
-		pixels = self.__compute_pixels()
-		self.__print_pixels(pixels)
+	def start(self, static=False):
+		if static:
+			self.__update_scene()
+		else:
+			while True:
+				before_comp_time = time.time()
+
+				self.__update_scene()
+
+				computation_time = time.time() - before_comp_time
+				sleep_time = (1 / self.fps) - computation_time
+				time.sleep(max(sleep_time, 0))
+
+	def move_camera_up(self):
+		self.camera.move_up()
+	
+	def move_camera_down(self):
+		self.camera.move_down()
+
+	def move_camera_left(self):
+		self.camera.move_left()
+	
+	def move_camera_right(self):
+		self.camera.move_right()
