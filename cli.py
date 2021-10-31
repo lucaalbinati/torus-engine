@@ -47,6 +47,9 @@ def on_press(key):
 		scene.move_camera_left()
 	elif key == keyboard.Key.right:
 		scene.move_camera_right()
+	elif key == keyboard.Key.esc:
+		scene.run = False
+		return False
 
 if __name__ == "__main__":
 

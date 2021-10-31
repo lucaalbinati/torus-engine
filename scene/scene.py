@@ -57,7 +57,8 @@ class Scene:
 		if static:
 			self.__update_scene()
 		else:
-			while True:
+			self.run = True
+			while self.run:
 				before_comp_time = time.time()
 
 				self.__update_scene()
