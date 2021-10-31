@@ -79,6 +79,9 @@ class Scene:
 	def move_camera_right(self):
 		self.camera.move_right()
 
+	def change_obj(self, new_obj):
+		self.obj = new_obj
+
 	def increment_light_source_intensity(self):
 		self.light_source.increment_intensity()
 

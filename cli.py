@@ -16,11 +16,19 @@ command_line_options = {
 	"-c": "camera position, as a 3 tuple: x y z (default is '7 0 3')"
 }
 
+all_objects_class_name = list_of_all_objects()
+DEFAULT_OBJ = "torus"
+
 def print_help():
 	print("The program takes these as arguments:\n")
 	for command_line_option, description in command_line_options.items():
 		print("  {}\t{}".format(command_line_option, description))
 	print()
+
+def import_and_get_object_class(obj_name):
+	module = __import__("objects.{}".format(obj_name.lower()), fromlist=[obj_name.capitalize()])
+	class_ = getattr(module, obj_name.capitalize())
+	return class_
 
 def parse_position_tuple(command_line_option, position_description):
 	x_idx = sys.argv.index(command_line_option) + 1
@@ -47,6 +55,12 @@ def on_press(key):
 		scene.move_camera_left()
 	elif key == keyboard.Key.right:
 		scene.move_camera_right()
+	elif key == keyboard.KeyCode.from_char('o'):
+		curr_obj_class_name = type(scene.obj).__name__.lower()
+		curr_index = all_objects_class_name.index(curr_obj_class_name)
+		next_index = (curr_index + 1) % len(all_objects_class_name)
+		new_obj = import_and_get_object_class(all_objects_class_name[next_index])()
+		scene.change_obj(new_obj)
 	elif key == keyboard.KeyCode.from_char('.'):
 		scene.increment_light_source_intensity()
 	elif key == keyboard.KeyCode.from_char(','):
@@ -67,17 +81,13 @@ if __name__ == "__main__":
 		if obj_idx >= len(sys.argv):
 			raise Exception("Expecting something after the command line option '-o'")
 
-		obj_value = sys.argv[obj_idx].lower()
-		all_objects = list_of_all_objects()
-		if not obj_value in all_objects:
-			raise Exception("The value after '-o' should be either: {}".format(", ".join(all_objects)))
+		obj_class_name = sys.argv[obj_idx].lower()
+		if not obj_class_name in all_objects_class_name:
+			raise Exception("The value after '-o' should be either: {}".format(", ".join(all_objects_class_name)))
 		
-		class_name = obj_value.capitalize()
-		module = __import__("objects.{}".format(obj_value), fromlist=[class_name])
-		class_ = getattr(module, class_name)
+		class_ = import_and_get_object_class(obj_class_name)
 	else:
-		module = __import__("objects.torus", fromlist=["Torus"])
-		class_ = getattr(module, "Torus")
+		class_ = import_and_get_object_class(DEFAULT_OBJ)
 	obj = class_()
 
 	# Parse light source position
