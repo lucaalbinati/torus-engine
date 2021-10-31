@@ -47,7 +47,11 @@ def on_press(key):
 		scene.move_camera_left()
 	elif key == keyboard.Key.right:
 		scene.move_camera_right()
-	elif key == keyboard.Key.esc:
+	elif key == keyboard.KeyCode.from_char('.'):
+		scene.increment_light_source_intensity()
+	elif key == keyboard.KeyCode.from_char(','):
+		scene.decrement_light_source_intensity()
+	elif key == keyboard.Key.esc or key == keyboard.KeyCode.from_char('\x03'):
 		scene.run = False
 		return False
 

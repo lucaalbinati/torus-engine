@@ -5,6 +5,7 @@ class Light:
 		self.position = position
 		self.intensity = intensity
 		self.ambient_light = ambient_light
+		self.intensity_increments = 10
 
 	def compute_brightness_on_point(self, observer, point_position, point_normal):
 		point_to_observer_vector = observer - point_position
@@ -23,3 +24,9 @@ class Light:
 				return self.ambient_light
 		else:
 			return 0
+
+	def increment_intensity(self):
+		self.intensity += self.intensity_increments
+
+	def decrement_intensity(self):
+		self.intensity = max(0, self.intensity - self.intensity_increments)

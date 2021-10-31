@@ -78,3 +78,9 @@ class Scene:
 	
 	def move_camera_right(self):
 		self.camera.move_right()
+
+	def increment_light_source_intensity(self):
+		self.light_source.increment_intensity()
+
+	def decrement_light_source_intensity(self):
+		self.light_source.decrement_intensity()
