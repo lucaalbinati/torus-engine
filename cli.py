@@ -6,8 +6,7 @@ from utils import list_of_all_objects
 from scene.scene import Scene
 from scene.camera import Camera
 from scene.light import Light
-from animation import Animation
-from rotation import Rotation
+from scene.status import Status
 
 command_line_options = {
 	"-h": "help",
@@ -55,6 +54,12 @@ def on_press(key):
 		scene.move_camera_left()
 	elif key == keyboard.Key.right:
 		scene.move_camera_right()
+	elif key == keyboard.KeyCode.from_char('p'):
+		scene.status = scene.status.pressed_pause()
+		if scene.status == Status.RUN:
+			scene.statusChangeEvent.set()
+		elif scene.status == Status.PAUSE:
+			scene.statusChangeEvent.clear()
 	elif key == keyboard.KeyCode.from_char('o'):
 		curr_obj_class_name = type(scene.obj).__name__.lower()
 		curr_index = all_objects_class_name.index(curr_obj_class_name)
@@ -66,7 +71,8 @@ def on_press(key):
 	elif key == keyboard.KeyCode.from_char(','):
 		scene.decrement_light_source_intensity()
 	elif key == keyboard.Key.esc or key == keyboard.KeyCode.from_char('\x03'):
-		scene.run = False
+		scene.status = Status.STOP
+		scene.statusChangeEvent.set()
 		return False
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 import time
 import numpy as np
+from threading import Event
 from utils import normalize_vector, get_brightness_char, clear_console
+from .status import Status
 
 class Scene:
 	def __init__(self, obj, light_source, camera, fps=5):
@@ -57,14 +59,23 @@ class Scene:
 		if static:
 			self.__update_scene()
 		else:
-			self.run = True
-			while self.run:
-				before_comp_time = time.time()
+			self.status = Status.RUN
+			self.statusChangeEvent = Event()
+			while True:
+				if self.status == Status.STOP:
+					break
+				elif self.status == Status.PAUSE:
+					self.__update_scene()
+					# wait until self.status changes
+					self.statusChangeEvent.wait()
+				elif self.status == Status.RUN:
+					before_comp_time = time.time()
+					self.__update_scene()
+					computation_time = time.time() - before_comp_time
+					sleep_time = (1 / self.fps) - computation_time
+				else:
+					raise Exception("Unknown Status '{}'".format(self.status))
 
-				self.__update_scene()
-
-				computation_time = time.time() - before_comp_time
-				sleep_time = (1 / self.fps) - computation_time
 				time.sleep(max(sleep_time, 0))
 
 	def move_camera_up(self):
