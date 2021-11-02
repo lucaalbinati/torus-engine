@@ -30,7 +30,7 @@ class Scene:
 			intersection_on_plane = self.camera.plane.find_intersection(self.camera.camera_point, point_to_camera_vector)
 			pixel = self.camera.plane.clip_point_to_pixel(intersection_on_plane)
 
-			if distance_to_point < pixels[pixel][1]:
+			if pixel != None and distance_to_point < pixels[pixel][1]:
 				pixels[pixel] = (intersection_on_plane, distance_to_point, brightness)
 		
 		return pixels

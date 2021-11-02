@@ -57,4 +57,6 @@ class Plane:
 		grid_position_w = int(horizontal_shift / self.pixel_incr_width)
 		grid_position_h = int(- vertical_shift / self.pixel_incr_height)
 		grid_position = grid_position_h * self.nb_pixel_width + grid_position_w
+		if grid_position < 0 or grid_position >= len(self.init_pixels):
+			return None
 		return grid_position
