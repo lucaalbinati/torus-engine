@@ -7,6 +7,7 @@ from scene.scene import Scene
 from scene.camera import Camera
 from scene.light import Light
 from scene.status import Status
+from scene.move import Move
 
 command_line_options = {
 	"-h": "help",
@@ -47,13 +48,13 @@ def parse_position_tuple(command_line_option, position_description):
 
 def on_press(key):
 	if key == keyboard.Key.up:
-		scene.move_camera_up()
+		scene.move_camera(Move.UP)
 	elif key == keyboard.Key.down:
-		scene.move_camera_down()
+		scene.move_camera(Move.DOWN)
 	elif key == keyboard.Key.left:
-		scene.move_camera_left()
+		scene.move_camera(Move.LEFT)
 	elif key == keyboard.Key.right:
-		scene.move_camera_right()
+		scene.move_camera(Move.RIGHT)
 	elif key == keyboard.KeyCode.from_char('p'):
 		scene.status = scene.status.pressed_pause()
 		if scene.status == Status.RUN:

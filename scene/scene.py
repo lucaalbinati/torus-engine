@@ -78,17 +78,8 @@ class Scene:
 
 				time.sleep(max(sleep_time, 0))
 
-	def move_camera_up(self):
-		self.camera.move_up()
-	
-	def move_camera_down(self):
-		self.camera.move_down()
-
-	def move_camera_left(self):
-		self.camera.move_left()
-	
-	def move_camera_right(self):
-		self.camera.move_right()
+	def move_camera(self, move):
+		self.camera.move(move)
 
 	def change_obj(self, new_obj):
 		self.obj = new_obj
