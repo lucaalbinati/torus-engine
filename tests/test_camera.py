@@ -36,9 +36,9 @@ def test_camera_orientation(observer, point_to_fix, horizontal_rotation, normal,
 @pytest.mark.parametrize("observer,point_to_fix,horizontal_rotation,move_sequence,new_camera_point",
     [
         (np.array([2, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([2, 0, 0])),
-        (np.array([2, 5, -1]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.UP, Move.UP, Move.DOWN, Move.DOWN], np.array([2, 5, -1]))#,
-        #(np.array([0, 2, 3]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([0, 2, 3])),
-        #(np.array([1, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.UP, Move.RIGHT, Move.DOWN], np.array([1, 0, 0]))
+        (np.array([2, 5, -1]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.UP, Move.UP, Move.DOWN, Move.DOWN], np.array([2, 5, -1])),
+        (np.array([0, 2, 3]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([0, 2, 3])),
+        (np.array([1, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.UP, Move.RIGHT, Move.DOWN], np.array([1, 0, 0]))
     ]
 )
 def test_camera_movement(observer, point_to_fix, horizontal_rotation, move_sequence, new_camera_point):
