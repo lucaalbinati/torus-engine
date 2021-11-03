@@ -6,7 +6,7 @@ from .plane import Plane
 from .move import Move
 
 class Camera:
-	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=os.get_terminal_size(), character_aspect_ratio=1/2):
+	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=None, character_aspect_ratio=1/2):
 		self.camera_point = observer
 		self.point_to_fix = point_to_fix
 		
@@ -19,6 +19,14 @@ class Camera:
 		angular_movement_increment = math.pi / 12
 		self.cos_increment = math.cos(angular_movement_increment)
 		self.tan_increment = math.tan(angular_movement_increment)
+
+		# get number of pixels (if running from a terminal window)
+		if nb_pixels == None:
+			try:
+				nb_pixels = os.get_terminal_size()
+			except OSError as e:
+				nb_pixels = (190, 100)
+				print("Not running from a terminal so the number of pixels is set to the default: {}".format(nb_pixels))
 		
 		# init camera plane
 		nb_pixel_width, nb_pixel_height = nb_pixels
@@ -63,14 +71,8 @@ class Camera:
 		return normalize_vector(rotated_up_vector), normalize_vector(rotated_horizontal_vector)
 
 	def __compute_new_camera_point(self, move):
-		# print("up: {}".format(self.up))
-		# print("normal: {}".format(self.normal))
-		# print("horizontal: {}".format(self.horizontal))
-		# print("old camera point: {}".format(self.camera_point))
-
 		camera_point_to_point_to_fix_distance = np.linalg.norm(self.point_to_fix - self.camera_point)
-		# print("dist before: {}".format(camera_point_to_point_to_fix_distance))
-		
+
 		depth_distance = camera_point_to_point_to_fix_distance * self.cos_increment
 		depth_vector = depth_distance * (- self.normal)
 
@@ -79,15 +81,9 @@ class Camera:
 			lateral_vector = lateral_distance * self.up * np.sign(move.value)
 		elif move.is_horizontal():
 			lateral_vector = lateral_distance * self.horizontal * np.sign(move.value)
-		
-		# print("depth vector: {}".format(depth_vector))
-		# print("lateral vector: {}".format(lateral_vector))
 
 		new_camera_point = self.point_to_fix + lateral_vector + depth_vector
 		new_camera_point = camera_point_to_point_to_fix_distance * normalize_vector(new_camera_point)
-		# print("dist after: {}".format(np.linalg.norm(new_camera_point - self.point_to_fix)))
-		
-		# print("new camera point: {}\n".format(new_camera_point))
 
 		return new_camera_point
 
