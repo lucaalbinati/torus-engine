@@ -32,3 +32,8 @@ jobs:
       run: |
         conda install pytest
         pytest
+    - name: Publish to Python Index
+      run: |
+        python increment_version.py
+        python -m build
+        twine upload dist/* -u __token__ -p ${{ secrets.PYPI_TORUS_ENGINE_TOKEN_PASSWORD }}
