@@ -7,8 +7,8 @@ import math
 import pytest
 import numpy as np
 from utils import normalize_vector
-from scene.camera import Camera
-from scene.move import Move
+from engine.camera import Camera
+from engine.move import Move
 
 ORIGIN = np.array([0, 0, 0])
 NO_HORIZONTAL_ROTATION = 0

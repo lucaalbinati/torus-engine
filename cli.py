@@ -3,11 +3,11 @@ import numpy as np
 from threading import Thread
 from pynput import keyboard
 from utils import list_of_all_objects
-from scene.scene import Scene
-from scene.camera import Camera
-from scene.light import Light
-from scene.status import Status
-from scene.move import Move
+from engine.scene import Scene
+from engine.camera import Camera
+from engine.light import Light
+from engine.status import Status
+from engine.move import Move
 
 command_line_options = {
 	"-h": "help",
