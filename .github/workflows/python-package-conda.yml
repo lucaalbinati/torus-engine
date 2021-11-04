@@ -33,7 +33,9 @@ jobs:
         conda install pytest
         pytest
     - name: Publish to Python Index
+      env:
+        TOKEN_PASSWORD: ${{ secrets.PYPI_TORUS_ENGINE_TOKEN_PASSWORD }}
       run: |
         python increment_version.py
         python -m build
-        twine upload dist/* -u __token__ -p ${{ secrets.PYPI_TORUS_ENGINE_TOKEN_PASSWORD }}
+        twine upload dist/* -u __token__ -p $TOKEN_PASSWORD
