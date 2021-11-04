@@ -3,7 +3,6 @@ import math
 import numpy as np
 from utils import normalize_vector
 from .plane import Plane
-from .move import Move
 
 class Camera:
 	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=None, character_aspect_ratio=1/2):
@@ -17,8 +16,8 @@ class Camera:
 		
 		# set and compute angular increment constants
 		angular_movement_increment = math.pi / 12
-		self.cos_increment = math.cos(angular_movement_increment)
-		self.tan_increment = math.tan(angular_movement_increment)
+		self.cos_increment = math.cos(angular_movement_increment) # cos(⍺)
+		self.cos_90_minus_increment = math.cos((math.pi / 2) - angular_movement_increment) # cos((π/2)-⍺)
 
 		# get number of pixels (if running from a terminal window)
 		if nb_pixels == None:
@@ -71,20 +70,14 @@ class Camera:
 		return normalize_vector(rotated_up_vector), normalize_vector(rotated_horizontal_vector)
 
 	def __compute_new_camera_point(self, move):
-		camera_point_to_point_to_fix_distance = np.linalg.norm(self.point_to_fix - self.camera_point)
+		rotation_circle_R = np.linalg.norm(self.point_to_fix - self.camera_point)
 
-		depth_distance = camera_point_to_point_to_fix_distance * self.cos_increment
-		depth_vector = depth_distance * (- self.normal)
-
-		lateral_distance = camera_point_to_point_to_fix_distance * self.tan_increment
 		if move.is_vertical():
-			lateral_vector = lateral_distance * self.up * np.sign(move.value)
+			lateral_direction_vector = self.up * np.sign(move.value)
 		elif move.is_horizontal():
-			lateral_vector = lateral_distance * self.horizontal * np.sign(move.value)
+			lateral_direction_vector = self.horizontal * np.sign(move.value)
 
-		new_camera_point = self.point_to_fix + lateral_vector + depth_vector
-		new_camera_point = camera_point_to_point_to_fix_distance * normalize_vector(new_camera_point)
-
+		new_camera_point = rotation_circle_R * (-self.normal * self.cos_increment + lateral_direction_vector * self.cos_90_minus_increment)
 		return new_camera_point
 
 	def move(self, move):
