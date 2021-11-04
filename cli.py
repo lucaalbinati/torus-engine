@@ -71,7 +71,7 @@ def on_press(key):
 		scene.increment_light_source_intensity()
 	elif key == keyboard.KeyCode.from_char(','):
 		scene.decrement_light_source_intensity()
-	elif key == keyboard.Key.esc or key == keyboard.KeyCode.from_char('\x03'):
+	elif key == keyboard.Key.esc or key == keyboard.KeyCode.from_char('\x03') or key == keyboard.KeyCode.from_char('q'):
 		scene.status = Status.STOP
 		scene.statusChangeEvent.set()
 		return False
