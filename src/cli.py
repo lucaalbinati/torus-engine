@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from threading import Thread
 from pynput import keyboard
-from utils import list_of_all_objects
+from engine.utils import list_of_all_objects
 from engine.scene import Scene
 from engine.camera import Camera
 from engine.light import Light
@@ -26,7 +26,7 @@ def print_help():
 	print()
 
 def import_and_get_object_class(obj_name):
-	module = __import__("objects.{}".format(obj_name.lower()), fromlist=[obj_name.capitalize()])
+	module = __import__("engine.objects.{}".format(obj_name.lower()), fromlist=[obj_name.capitalize()])
 	class_ = getattr(module, obj_name.capitalize())
 	return class_
 

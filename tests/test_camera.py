@@ -1,12 +1,7 @@
-import os
-import sys
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, "{}/..".format(dir_path))
-
 import math
 import pytest
 import numpy as np
-from utils import normalize_vector
+from engine.utils import normalize_vector
 from engine.camera import Camera
 from engine.move import Move
 
