@@ -1,8 +1,8 @@
 import time
 import numpy as np
 from threading import Event
-from engine.utils import normalize_vector, get_brightness_char, clear_console
-from engine.status import Status
+from torusengine.utils import normalize_vector, get_brightness_char, clear_console
+from torusengine.status import Status
 
 class Scene:
 	def __init__(self, obj, light_source, camera, fps=5):
