@@ -12,6 +12,7 @@ from scene.move import Move
 
 ORIGIN = np.array([0, 0, 0])
 NO_HORIZONTAL_ROTATION = 0
+DEFAULT_ATOL = 1.e-8
 
 @pytest.mark.parametrize("observer,point_to_fix,horizontal_rotation,normal,up,horizontal",
     [
@@ -33,16 +34,21 @@ def test_camera_orientation(observer, point_to_fix, horizontal_rotation, normal,
     assert np.allclose(camera.plane.up, up)
     assert np.allclose(camera.plane.horizontal, horizontal)
 
-@pytest.mark.parametrize("observer,point_to_fix,horizontal_rotation,move_sequence,new_camera_point",
+@pytest.mark.parametrize("observer,point_to_fix,horizontal_rotation,move_sequence,expected_camera_point,atol",
     [
-        (np.array([2, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([2, 0, 0])),
-        (np.array([2, 5, -1]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.UP, Move.UP, Move.DOWN, Move.DOWN], np.array([2, 5, -1])),
-        (np.array([0, 2, 3]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([0, 2, 3])),
-        (np.array([1, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.UP, Move.RIGHT, Move.DOWN], np.array([1, 0, 0]))
+        (np.array([2, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([2, 0, 0]), DEFAULT_ATOL),
+        (np.array([2, 5, -1]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.UP, Move.UP, Move.DOWN, Move.DOWN], np.array([2, 5, -1]), DEFAULT_ATOL),
+        (np.array([1, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.LEFT, Move.RIGHT, Move.LEFT, Move.RIGHT, Move.RIGHT], np.array([1, 0, 0]), DEFAULT_ATOL),
+        (np.array([1, 0, 0]), ORIGIN, NO_HORIZONTAL_ROTATION, [Move.LEFT, Move.UP, Move.RIGHT, Move.DOWN], np.array([1, 0, 0]), 1.e-2)
     ]
 )
-def test_camera_movement(observer, point_to_fix, horizontal_rotation, move_sequence, new_camera_point):
+def test_camera_movement(observer, point_to_fix, horizontal_rotation, move_sequence, expected_camera_point, atol):
     camera = Camera(observer=observer, point_to_fix=point_to_fix, horizontal_rotation=horizontal_rotation)
+    prev_camera_point = camera.camera_point
     for move in move_sequence:
         camera.move(move)
-    assert np.allclose(camera.camera_point, new_camera_point)
+        # verify that the angle between the two vectors is in line with the angle by which we rotated
+        assert np.isclose(np.dot(normalize_vector(prev_camera_point), normalize_vector(camera.camera_point)), camera.cos_increment)
+        prev_camera_point = camera.camera_point
+    # verify that the final position of the camera is what we expected
+    assert np.allclose(camera.camera_point, expected_camera_point, atol=atol)
