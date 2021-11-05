@@ -32,10 +32,10 @@ jobs:
       run: |
         conda install pytest
         pytest
-    - name: Publish to Python Index
+    - name: Publish to Python Index (with bumped version)
       env:
         TOKEN_PASSWORD: ${{ secrets.PYPI_TORUS_ENGINE_TOKEN_PASSWORD }}
       run: |
-        python increment_version.py
+        bump --patch
         python -m build
         twine upload dist/* -u __token__ -p $TOKEN_PASSWORD

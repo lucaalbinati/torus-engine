@@ -3,4 +3,7 @@ websites/
 
 .vscode/
 
+src/torus_engine.egg-info/
 dist/
+
+config.py
