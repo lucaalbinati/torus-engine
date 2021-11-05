@@ -26,7 +26,9 @@ subprocess.run(["python", "-m", "build"])
 
 # publish using twine
 try:
-    subprocess.run(["twine", "upload", "dist/*", "-u", config.username, "-p", config.password])
+    subprocess.run(["twine", "upload", "dist/*", "-u", config.PYPI_TOKEN_USERNAME, "-p", config.PYPI_TOKEN_PASSWORD])
+except AttributeError as e:
+    print("Make sure you have a file named 'config.py' in the project's root with both 'PYPI_TOKEN_USERNAME' and 'PYPI_TOKEN_PASSWORD' set.")
 finally:
     # remove build files
     subprocess.run(["rm", "-r", "dist"])
