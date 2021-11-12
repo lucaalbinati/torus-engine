@@ -22,13 +22,13 @@ class Camera:
 		# get number of pixels (if running from a terminal window)
 		if nb_pixels == None:
 			try:
-				nb_pixels = os.get_terminal_size()
+				self.nb_pixels = os.get_terminal_size()
 			except OSError as e:
-				nb_pixels = (190, 100)
-				print("Not running from a terminal so the number of pixels is set to the default: {}".format(nb_pixels))
+				self.nb_pixels = (190, 100)
+				print("Not running from a terminal so the number of pixels is set to the default: {}".format(self.nb_pixels))
 		
 		# init camera plane
-		nb_pixel_width, nb_pixel_height = nb_pixels
+		nb_pixel_width, nb_pixel_height = self.nb_pixels
 		aspect_ratio = nb_pixel_width / (nb_pixel_height / character_aspect_ratio)
 		width = 1
 		height = width / aspect_ratio
