@@ -1,8 +1,8 @@
+import os
 import setuptools
 
-def readme():
-    with open('README.md') as f:
-        return f.read()
+rootdir = os.path.abspath(os.path.dirname(__file__))
+long_description = open(os.path.join(rootdir, 'README.md')).read()
 
 setuptools.setup(
     name="torus-engine",
@@ -10,7 +10,7 @@ setuptools.setup(
     author="Luca Albinati",
     author_email="luca.albinati@gmail.com",
     description="3D ASCII character rendering engine",
-    long_description=readme(),
+    long_description = long_description,
     url="https://github.com/lucaalbinati/torus-engine",
     project_urls={
         "Bug Tracker": "https://github.com/lucaalbinati/torus-engine/issues",
