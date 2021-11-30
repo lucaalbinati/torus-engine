@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="torus-engine",
-    version="1.1.0",
+    version="1.1.1",
     author="Luca Albinati",
     author_email="luca.albinati@gmail.com",
     description="3D ASCII character rendering engine",
