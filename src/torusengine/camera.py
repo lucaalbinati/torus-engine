@@ -5,9 +5,9 @@ from torusengine.utils import normalize_vector
 from torusengine.plane import Plane
 
 class Camera:
-	def __init__(self, observer, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=None, character_aspect_ratio=1/2):
-		self.camera_point = observer
-		self.point_to_fix = point_to_fix
+	def __init__(self, camera_position, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=None, character_aspect_ratio=1/2):
+		self.camera_point = np.array(camera_position)
+		self.point_to_fix = np.array(point_to_fix)
 		
 		# compute plane vectors
 		self.normal = normalize_vector(point_to_fix - self.camera_point)
@@ -82,4 +82,4 @@ class Camera:
 
 	def move(self, move):
 		new_camera_point = self.__compute_new_camera_point(move)
-		self.__init__(observer=new_camera_point)
+		self.__init__(camera_position=new_camera_point)

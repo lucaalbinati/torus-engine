@@ -4,10 +4,10 @@ from torusengine.utils import normalize_vector
 
 class Plane:
 	def __init__(self, p0, normal, up, horizontal, height, width, nb_pixel_height, nb_pixel_width, pixel_incr_height, pixel_incr_width):
-		self.p0 = p0
-		self.normal = normal
-		self.up = up
-		self.horizontal = horizontal
+		self.p0 = np.array(p0)
+		self.normal = np.array(normal)
+		self.up = np.array(up)
+		self.horizontal = np.array(horizontal)
 		self.height = height
 		self.width = width
 		self.nb_pixel_height = nb_pixel_height

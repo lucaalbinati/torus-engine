@@ -2,7 +2,7 @@ import numpy as np
 
 class Light:
 	def __init__(self, position, intensity=100, ambient_light=1):
-		self.position = position
+		self.position = np.array(position)
 		self.intensity = intensity
 		self.ambient_light = ambient_light
 		self.intensity_increments = 10
