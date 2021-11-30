@@ -1,11 +1,16 @@
 import setuptools
 
+def readme():
+    with open('README.md') as f:
+        return f.read()
+
 setuptools.setup(
     name="torus-engine",
     version="1.1.1",
     author="Luca Albinati",
     author_email="luca.albinati@gmail.com",
     description="3D ASCII character rendering engine",
+    long_description=readme(),
     url="https://github.com/lucaalbinati/torus-engine",
     project_urls={
         "Bug Tracker": "https://github.com/lucaalbinati/torus-engine/issues",
