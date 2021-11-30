@@ -11,6 +11,7 @@ setuptools.setup(
     author_email="luca.albinati@gmail.com",
     description="3D ASCII character rendering engine",
     long_description = long_description,
+    long_description_content_type='text/markdown',
     url="https://github.com/lucaalbinati/torus-engine",
     project_urls={
         "Bug Tracker": "https://github.com/lucaalbinati/torus-engine/issues",
