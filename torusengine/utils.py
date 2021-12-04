@@ -1,9 +1,6 @@
 import os
 import sys
 import numpy as np
-from pathlib import Path
-
-PYTHON_EXTENSION = ".py"
 
 brightness_char_zero = " "
 brightness_chars_dict = {
@@ -51,8 +48,3 @@ def rotate(rotation_matrix_func, theta, points, normals):
 		normals = np.transpose(np.dot(rotation_matrix, normals))
 
 		return points, normals
-
-def list_of_all_objects():
-	parent_dir = Path(os.path.realpath(__file__)).parent
-	objects_dir = "{}/{}".format(parent_dir, "objects")
-	return [f[:-len(PYTHON_EXTENSION)] for f in os.listdir(objects_dir) if os.path.isfile(os.path.join(objects_dir, f)) and f.endswith(PYTHON_EXTENSION) and f != "__init__.py"]
