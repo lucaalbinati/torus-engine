@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from torusengine.utils import normalize_vector
+from utils import normalize_vector
 
 class Plane:
 	def __init__(self, p0, normal, up, horizontal, height, width, nb_pixel_height, nb_pixel_width, pixel_incr_height, pixel_incr_width):

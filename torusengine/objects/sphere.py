@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from torusengine.utils import normalize_vector, rotate
+from utils import normalize_vector, rotate
 
 class Sphere:
 	def __init__(self, R=1.0, theta_step=50, phi_step=50):
