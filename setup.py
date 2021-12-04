@@ -6,7 +6,7 @@ long_description = open(os.path.join(rootdir, 'README.md')).read()
 
 setuptools.setup(
     name="torus-engine",
-    version="1.3.0",
+    version="1.3.1",
     author="Luca Albinati",
     author_email="luca.albinati@gmail.com",
     description="3D ASCII character rendering engine",
@@ -21,6 +21,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    package_dir={"": "torusengine"},
     packages=setuptools.find_packages(where="torusengine"),
     python_requires=">=3.7",
 )
