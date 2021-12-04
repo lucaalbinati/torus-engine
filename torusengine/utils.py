@@ -1,3 +1,4 @@
+from math import e
 import os
 import sys
 import numpy as np
@@ -48,3 +49,10 @@ def rotate(rotation_matrix_func, theta, points, normals):
 		normals = np.transpose(np.dot(rotation_matrix, normals))
 
 		return points, normals
+
+def replace_in_string(string, index, character):
+	if len(character) != 1:
+		raise Exception("Parameter 'character' must be a character or a string of length 1.")
+	if not (0 <= index and index < len(string)):
+		raise Exception("Paramter 'index' must be between 0 and len('string')")
+	return string[:index] + character + string[index+1:]

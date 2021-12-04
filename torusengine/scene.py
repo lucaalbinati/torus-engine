@@ -1,8 +1,9 @@
 import time
 import numpy as np
 from threading import Event
-from utils import normalize_vector, get_brightness_char, clear_console
+from utils import normalize_vector, get_brightness_char, clear_console, replace_in_string
 from status import Status
+from text_position import TextPosition
 
 class Scene:
 	def __init__(self, obj, light_source, camera, fps=5):
@@ -35,14 +36,61 @@ class Scene:
 		
 		return pixels
 
+	# def __overlay_text(self, pixels_to_print, text_to_add, text_position):
+	# 	pixel_width, pixel_height = self.camera.nb_pixels
+	# 	text_to_add_len = len(text_to_add)
+
+	# 	if text_position == TextPosition.CENTER:
+	# 		middle_line = int(pixel_height / 2)
+	# 		starting_position = int((middle_line * pixel_width) + int((pixel_width / 2) - (text_to_add_len / 2)))
+	# 		ending_position = starting_position + text_to_add_len
+	# 	elif text_position == TextPosition.TOP_LEFT:
+	# 		line = 3
+	# 		margin = 3
+	# 		if line > pixel_height or margin > pixel_width:
+	# 			return
+	# 		starting_position = (line * pixel_width) + margin
+	# 		ending_position = starting_position + text_to_add_len
+	# 	else:
+	# 		raise Exception("Not supported yet")
+
+	# 	return pixels_to_print[:starting_position] + text_to_add + pixels_to_print[ending_position:]
+
+	def __get_pause_mask(self):
+		mask_relative = [(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|'),
+							(0, 0, '|'), (0, 0, '|'), (0, 0, ' '), (0, 0, ' '), (0, 0, ' '), (0, 0, '|'), (0, 0, '|')]
+		X_OFFSET= 3
+		Y_OFFSET = 3
+		mask_absolute = [(x + X_OFFSET, y + Y_OFFSET, c) for x, y, c in mask_relative]
+		return mask_absolute
+
+	def __overlay_status(self, pixels_to_print):
+		if self.status == Status.PAUSE:
+			pixel_width, _ = self.camera.nb_pixels
+			mask = self.__get_pause_mask()
+			for x, y, c in mask:
+				idx = y * pixel_width + x
+				pixels_to_print = replace_in_string(pixels_to_print, idx, c)
+			return pixels_to_print
+
 	def __print_pixels(self, pixels):
+		# TODO overlay additional information over the scene's pixels
 		clear_console()
-		text_to_print = ""
+
+		pixels_to_print = ""
 		for i, (_, _, brightness) in pixels.items():
 			if i % self.camera.plane.nb_pixel_width == 0 and i > 0:
-				text_to_print += "\n"
-			text_to_print += get_brightness_char(brightness)
-		print(text_to_print)
+				pixels_to_print += "\n"
+			pixels_to_print += get_brightness_char(brightness)
+
+		pixels_to_print = self.__overlay_status(pixels_to_print)
+		
+		print(pixels_to_print)
 
 	def __update_scene(self):
 		self.__compute_illumination()
