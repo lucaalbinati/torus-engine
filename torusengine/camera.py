@@ -1,8 +1,8 @@
 import os
 import math
 import numpy as np
-from torusengine.utils import normalize_vector
-from torusengine.plane import Plane
+from utils import normalize_vector
+from plane import Plane
 
 class Camera:
 	def __init__(self, camera_position, point_to_fix=np.array([0, 0, 0]), horizontal_rotation=0, camera_to_plane_distance=1, nb_pixels=None, character_aspect_ratio=1/2):
