@@ -3,5 +3,5 @@ websites/
 
 .vscode/
 
-src/torus_engine.egg-info/
+torus_engine.egg-info/
 dist/
