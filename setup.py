@@ -21,7 +21,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "torusengine"},
+    package_dir={"": "."},
     packages=setuptools.find_packages(where="torusengine"),
     python_requires=">=3.7",
 )
