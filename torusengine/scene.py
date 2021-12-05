@@ -114,8 +114,10 @@ class Scene:
 					break
 				elif self.status == Status.PAUSE:
 					self.__update_scene()
-					# wait until self.status changes
+					self.statusChangeEvent.clear()
+					# wait until the flag is set, indicating a change
 					self.statusChangeEvent.wait()
+					self.statusChangeEvent.clear()
 				elif self.status == Status.RUN:
 					before_comp_time = time.time()
 					self.__update_scene()
@@ -127,13 +129,17 @@ class Scene:
 				time.sleep(max(sleep_time, 0))
 
 	def move_camera(self, move):
-		self.camera.move(move)
+		if self.status == Status.RUN:
+			self.camera.move(move)
 
 	def change_obj(self, new_obj):
-		self.obj = new_obj
+		if self.status == Status.RUN:
+			self.obj = new_obj
 
 	def increment_light_source_intensity(self):
-		self.light_source.increment_intensity()
+		if self.status == Status.RUN:
+			self.light_source.increment_intensity()
 
 	def decrement_light_source_intensity(self):
-		self.light_source.decrement_intensity()
+		if self.status == Status.RUN:
+			self.light_source.decrement_intensity()
